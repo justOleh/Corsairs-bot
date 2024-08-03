@@ -1,0 +1,3 @@
+pyobjc
+AppKit
+opencv-python
