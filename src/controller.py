@@ -19,7 +19,7 @@ class Controller:
         self.boat = None
 
         self.templates = self.load_templates()
-        self.template_thresholds = {"boat": 0.55, "coin": 0.8, "cannonball": 0.5}
+        self.template_thresholds = {"boat": 0.55, "coin": 0.8, "cannonball": 0.6}
 
     def run(self, seconds_to_play=None):
         if self.window_id is None:
@@ -29,10 +29,11 @@ class Controller:
         self.window_coordinates = get_window_coordinates(self.window_id)
 
         start = time.time()
-        # self.start()
+        self.start()
 
         while True:
 
+            cv.namedWindow("main")
             self.main_loop()
     
             # end when seconds_to_play passed
@@ -46,11 +47,19 @@ class Controller:
         # TODO: check that only 1 exists
         boat_positions = self.get_position(screenshot, self.templates["boat"], self.template_thresholds["boat"])
         boat_position = self.non_maximum_suppression(boat_positions)
-        self.imshow(self.draw_rectangles(screenshot, boat_position))
-        
+                
         coins_position = self.get_position(screenshot, self.templates["coin"], self.template_thresholds["coin"])
         coin_position = self.non_maximum_suppression(coins_position)
-        self.imshow(self.draw_rectangles(screenshot, coin_position))
+
+        cannonballs_position = self.get_position(screenshot, self.templates["cannonball"], self.template_thresholds["cannonball"])
+        cannonball_position = self.non_maximum_suppression(cannonballs_position)
+
+        image_vis = self.draw_rectangles(screenshot, boat_position, color=(255, 0, 0))
+        image_vis = self.draw_rectangles(image_vis, coin_position, color=(0, 255, 0))
+        image_vis = self.draw_rectangles(image_vis, cannonball_position, color=(0, 0, 255))
+
+        cv.imshow("main", image_vis)
+        cv.waitKey(30)
 
     def start(self):
         pyautogui.press("space")
@@ -94,20 +103,20 @@ class Controller:
         
         return templates
     
-    def imshow(self, image):
+    def imshow(self, image, pause=0):
         cv.namedWindow("main")
         cv.imshow("main", image)
-        cv.waitKey()
+        cv.waitKey(pause)
         cv.destroyWindow("main")
 
-    def draw_rectangles(self, image, rectangles):
+    def draw_rectangles(self, image, rectangles, color=(0, 0, 255)):
         image_to_vis = image.copy()
                 
         for rect in rectangles:
             print(rect)
             top_left = (rect[0], rect[1])
             bottom_right = (rect[2], rect[3])
-            cv.rectangle(image_to_vis, top_left, bottom_right, (0, 0, 255), 1)
+            cv.rectangle(image_to_vis, top_left, bottom_right, color, 1)
 
         return image_to_vis
     
