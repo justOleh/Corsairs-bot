@@ -184,6 +184,7 @@ class Controller:
         a = np.array(a)
         b = np.array(b)
         # common formula to calculate angle between two vectors
+        # TODO: linalg.norm, ord=2
         angle_radians = np.arccos(np.sum(a*b)/(np.linalg.norm(a)*np.linalg.norm(b)))
         angle_degrees = angle_radians*(180/np.pi)
         return angle_degrees
