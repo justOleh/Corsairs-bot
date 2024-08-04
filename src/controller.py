@@ -39,11 +39,17 @@ class Controller:
         start = time.time()
         self.start()
 
+        video_name = 'boat_angle.mp4'
+        fourcc = cv.VideoWriter_fourcc(*'mp4v')
+        video = cv.VideoWriter(video_name, fourcc, 5, (380, 690)) 
+
+        cv.namedWindow("main")
+        
         while True:
 
-            cv.namedWindow("main")
             try:
-                self.main_loop()
+                image_vis = self.main_loop()
+                video.write(image_vis)
             except:
                 pass
     
@@ -54,6 +60,7 @@ class Controller:
                 # print(self.positions)
                 # pd.DataFrame({"boat": self.positions["boat"]}).to_csv("boat_positions.csv")
                 # pd.DataFrame({"cannonball": self.positions["cannonball"]}).to_csv("cannonball_positions.csv")
+                video.release()
                 self.exit("Bot has finished execution")
 
         
@@ -71,13 +78,23 @@ class Controller:
         cannonballs_position = self.get_position(screenshot, self.templates["cannonball"], self.template_thresholds["cannonball"])
         cannonball_positions = self.non_maximum_suppression(cannonballs_position)
         cannonball_centers = [self.calc_center(cannonball_pos) for cannonball_pos in cannonball_positions]
+        cannonball_centers_normalised = [self.normalize_point(boat_center) for cannonball_center in cannonball_centers]
 
-        print(boat_center)
-        boat_angle = self.calc_angle(boat_center, self.raidus_vect)
+        boat_center_normalised = self.normalize_point(boat_center)
+        boat_angle = self.calc_angle(boat_center_normalised, self.raidus_vect)
+
+        cannonball_angles = [self.calc_angle(cannonball_center, self.raidus_vect)
+                             for cannonball_center in cannonball_centers_normalised]
+        
+        print(cannonball_angles)
+        
         image_vis = screenshot.copy()
         image_vis = self.draw_angle(image_vis, boat_angle)
-        cv.imshow("main", image_vis)
-        cv.waitKey(30)
+        # cv.imshow("main", image_vis)
+        # cv.waitKey(30)
+
+        return image_vis
+        # return None
 
         # print(cannonball_centers)
 
@@ -184,10 +201,9 @@ class Controller:
         a = np.array(a)
         b = np.array(b)
         # common formula to calculate angle between two vectors
-        # TODO: linalg.norm, ord=2
-        angle_radians = np.arccos(np.sum(a*b)/(np.linalg.norm(a)*np.linalg.norm(b)))
+        angle_radians = np.arccos(np.sum(a*b)/(np.linalg.norm(a, ord=2)*np.linalg.norm(b, ord=2)))
         angle_degrees = angle_radians*(180/np.pi)
-        return angle_degrees
+        return float(angle_degrees)
     
     def draw_angle(self, image, value):
         font = cv.FONT_HERSHEY_SIMPLEX
