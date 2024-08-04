@@ -1,24 +1,24 @@
 import time
+import sys
+import pyautogui
+# import pygetwindow as gw
 
-# import pyautogui
-import AppKit
-
+from src.window_manipulation import find_window_id, activate_window, get_window_geometry
 
 
 class Controller:
-    def __init__(self, window_name = "Telegram") -> None:
-        self.window = self.get_window(window_name)
-        self.window.activateWithOptions_(AppKit.NSApplicationActivateIgnoringOtherApps)
-        
-        print(self.window)
+    def __init__(self, window_name = "TelegramDesktop") -> None:
+        self.window_name = window_name
+        self.window_id = find_window_id(window_name)
         self.coins = []
         self.cannonballs = []
         self.boat = None
 
     def run(self, seconds_to_play=None):
-        self.window.restore()
-        self.window.activate()
+        if self.window_id is None:
+            self.exit(f"Cannot find window: {self.window_name}")
 
+        activate_window(self.window_id)
         start = time.time()
         while True:
             # main logic
@@ -29,15 +29,6 @@ class Controller:
             seconds_played = end - start
             if (seconds_to_play is not None) and (seconds_played >= seconds_to_play):
                 break
-
-
-    def get_window(self, window_name):
-        apps = AppKit.NSWorkspace.sharedWorkspace().runningApplications()
-        for app in apps:
-            if window_name in app.localizedName():
-                return app
-
-    # def take_screenshot(self):
-    #      screenshot = pyautogui.screenshot(region=(self.window.left, self.window.top,
-    #                                                self.window.width, self.window.height))
-    #      print(screenshot)
+    
+    def exit(self, message):
+        sys.exit(message)
