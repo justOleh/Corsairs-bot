@@ -1,5 +1,9 @@
 import subprocess
 
+import cv2 as cv
+import numpy as np
+import pyautogui
+
 
 def find_window_id(window_title):
     """Find the window ID of a window with a specific title."""
@@ -10,8 +14,8 @@ def find_window_id(window_title):
     return None
 
 
-def get_window_geometry(window_id):
-    """Get the geometry of a window by its ID."""
+def get_window_coordinates(window_id):
+    """Get the positions of the top-left and bottom-right coordinates of a window by its ID."""
     output = subprocess.run(['xwininfo', '-id', window_id], capture_output=True).stdout.decode()
     geometry = {}
     for line in output.splitlines():
@@ -23,7 +27,10 @@ def get_window_geometry(window_id):
             geometry['width'] = int(line.split()[-1])
         if 'Height:' in line:
             geometry['height'] = int(line.split()[-1])
-    return geometry
+    
+    x1, y1 = geometry['x'], geometry['y']
+    width, height = geometry['width'], geometry['height']
+    return x1, y1, width, height 
 
 
 def activate_window(window_id):
@@ -31,16 +38,12 @@ def activate_window(window_id):
     subprocess.run(['wmctrl', '-i', '-a', window_id])
 
 
-def calculate_corners(geometry):
-    """Calculate the positions of the four corners of the window."""
-    x, y = geometry['x'], geometry['y']
-    width, height = geometry['width'], geometry['height']
-    return {
-        'top_left': (x, y),
-        'top_right': (x + width, y),
-        'bottom_left': (x, y + height),
-        'bottom_right': (x + width, y + height)
-    }
+def take_screenshot(window_coordinates):
+     pil_image = pyautogui.screenshot(region=window_coordinates)
+     open_cv_image = np.array(pil_image)
+     open_cv_image = cv.cvtColor(open_cv_image, cv.COLOR_RGB2BGR)
+     return open_cv_image
+
 
 if __name__ == "__main__":
     window_title = 'TelegramDesktop'  # Replace with your window's title

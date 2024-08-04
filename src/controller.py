@@ -1,9 +1,11 @@
-import time
 import sys
-import pyautogui
-# import pygetwindow as gw
+import time
 
-from src.window_manipulation import find_window_id, activate_window, get_window_geometry
+import cv2 as cv
+
+from src.window_manipulation import (activate_window, find_window_id,
+                                     get_window_coordinates, take_screenshot)
+import pyautogui
 
 
 class Controller:
@@ -19,16 +21,27 @@ class Controller:
             self.exit(f"Cannot find window: {self.window_name}")
 
         activate_window(self.window_id)
+        self.window_coordinates = get_window_coordinates(self.window_id)
+
         start = time.time()
+        self.start()
+
         while True:
-            # main logic
 
-
+            self.main_loop()
+    
             # end when seconds_to_play passed
             end = time.time()
             seconds_played = end - start
             if (seconds_to_play is not None) and (seconds_played >= seconds_to_play):
-                break
+                self.exit("Bot has finished execution")
+
+    def main_loop(self):
+        screenshot = take_screenshot(self.window_coordinates)
+
+    def start(self):
+        pyautogui.press("space")
+
     
     def exit(self, message):
         sys.exit(message)
