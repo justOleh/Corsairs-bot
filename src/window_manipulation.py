@@ -28,8 +28,8 @@ def get_window_coordinates(window_id):
         if 'Height:' in line:
             geometry['height'] = int(line.split()[-1])
     
-    x1, y1 = geometry['x'], geometry['y']
-    width, height = geometry['width'], geometry['height']
+    x1, y1 = geometry['x']+11, geometry['y']+11
+    width, height = geometry['width']-22, geometry['height']-22
     return x1, y1, width, height 
 
 

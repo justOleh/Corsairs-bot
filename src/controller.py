@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 import cv2 as cv
 import numpy as np
+import pandas as pd
 
 
 from src.window_manipulation import (activate_window, find_window_id,
@@ -21,6 +22,12 @@ class Controller:
         self.templates = self.load_templates()
         self.template_thresholds = {"boat": 0.55, "coin": 0.8, "cannonball": 0.6}
 
+        self.speeds = {"boat": 100, "cannonball": 6.32}
+        # self.positions = {"boat": [], "cannonball": []}
+        self.radius = 158 # in pixels
+        self.raidus_vect = (self.radius, 0)
+
+
     def run(self, seconds_to_play=None):
         if self.window_id is None:
             self.exit(f"Cannot find window: {self.window_name}")
@@ -34,32 +41,54 @@ class Controller:
         while True:
 
             cv.namedWindow("main")
-            self.main_loop()
+            try:
+                self.main_loop()
+            except:
+                pass
     
             # end when seconds_to_play passed
             end = time.time()
             seconds_played = end - start
             if (seconds_to_play is not None) and (seconds_played >= seconds_to_play):
+                # print(self.positions)
+                # pd.DataFrame({"boat": self.positions["boat"]}).to_csv("boat_positions.csv")
+                # pd.DataFrame({"cannonball": self.positions["cannonball"]}).to_csv("cannonball_positions.csv")
                 self.exit("Bot has finished execution")
 
+        
     def main_loop(self):
         screenshot = take_screenshot(self.window_coordinates)
+
         # TODO: check that only 1 exists
         boat_positions = self.get_position(screenshot, self.templates["boat"], self.template_thresholds["boat"])
         boat_position = self.non_maximum_suppression(boat_positions)
+        boat_center = self.calc_center(boat_position[0])
                 
         coins_position = self.get_position(screenshot, self.templates["coin"], self.template_thresholds["coin"])
         coin_position = self.non_maximum_suppression(coins_position)
 
         cannonballs_position = self.get_position(screenshot, self.templates["cannonball"], self.template_thresholds["cannonball"])
-        cannonball_position = self.non_maximum_suppression(cannonballs_position)
+        cannonball_positions = self.non_maximum_suppression(cannonballs_position)
+        cannonball_centers = [self.calc_center(cannonball_pos) for cannonball_pos in cannonball_positions]
 
-        image_vis = self.draw_rectangles(screenshot, boat_position, color=(255, 0, 0))
-        image_vis = self.draw_rectangles(image_vis, coin_position, color=(0, 255, 0))
-        image_vis = self.draw_rectangles(image_vis, cannonball_position, color=(0, 0, 255))
-
+        print(boat_center)
+        boat_angle = self.calc_angle(boat_center, self.raidus_vect)
+        image_vis = screenshot.copy()
+        image_vis = self.draw_angle(image_vis, boat_angle)
         cv.imshow("main", image_vis)
         cv.waitKey(30)
+
+        # print(cannonball_centers)
+
+        # self.positions["boat"].extend(boat_position)
+        # self.positions["cannonball"].extend(cannonball_positions)
+
+        # image_vis = self.draw_rectangles(screenshot, boat_position, color=(255, 0, 0))
+        # image_vis = self.draw_rectangles(image_vis, coin_position, color=(0, 255, 0))
+        # image_vis = self.draw_rectangles(image_vis, cannonball_positions, color=(0, 0, 255))
+
+        # cv.imshow("main", image_vis)
+        # cv.waitKey(30)
 
     def start(self):
         pyautogui.press("space")
@@ -95,7 +124,7 @@ class Controller:
 
     def load_templates(self):
         # TODO: move to config
-        folder_path = Path("src/image_processing/templates")
+        folder_path = Path("src/image_processing/assets/templates")
         templates = {}
         templates["boat"] = cv.imread(folder_path/"boat.png")
         templates["coin"] = cv.imread(folder_path/"coin.png")
@@ -145,9 +174,36 @@ class Controller:
             rectangles = [box for box in rectangles if intersection_over_union(current, box) < threshold]
         
         return selected_boxes
-
-
-
     
+
+    def calc_center(self, coordinates: tuple):
+        return (coordinates[0] + coordinates[2])//2, (coordinates[1] + coordinates[3])//2
+
+    def calc_angle(self, a, b):
+        a = np.array(a)
+        b = np.array(b)
+        # common formula to calculate angle between two vectors
+        angle_radians = np.arccos(np.sum(a*b)/(np.linalg.norm(a)*np.linalg.norm(b)))
+        angle_degrees = angle_radians*(180/np.pi)
+        return angle_degrees
+    
+    def draw_angle(self, image, value):
+        font = cv.FONT_HERSHEY_SIMPLEX
+        font_scale = 1
+        font_color = (0, 255, 0)
+        thickness = 2
+        line_type = cv.LINE_AA
+        
+        text = f"{value:.2f}"
+        
+        text_size, _ = cv.getTextSize(text, font, font_scale, thickness)
+        text_width, text_height = text_size
+
+        position = (10, text_height + 10)
+    
+        cv.putText(image, text, position, font, font_scale, font_color, thickness, line_type)
+        
+        return image
+
     def exit(self, message):
         sys.exit(message)
