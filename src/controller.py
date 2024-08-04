@@ -24,8 +24,9 @@ class Controller:
 
         self.speeds = {"boat": 100, "cannonball": 6.32}
         # self.positions = {"boat": [], "cannonball": []}
-        self.radius = 158 # in pixels
+        self.radius = 160 # in pixels
         self.raidus_vect = (self.radius, 0)
+        self.center_of_game = (190, 265)
 
 
     def run(self, seconds_to_play=None):
@@ -204,6 +205,10 @@ class Controller:
         cv.putText(image, text, position, font, font_scale, font_color, thickness, line_type)
         
         return image
+    
+    def normalize_point(self, coordiantes: tuple[int, int]):
+        return (coordiantes[0]-self.center_of_game[0],
+                coordiantes[1]-self.center_of_game[1])
 
     def exit(self, message):
         sys.exit(message)
