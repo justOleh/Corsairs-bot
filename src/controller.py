@@ -23,10 +23,12 @@ class Controller:
         self.template_thresholds = {"boat": 0.55, "coin": 0.8, "cannonball": 0.6}
 
         self.speeds = {"boat": 100, "cannonball": 6.32}
-        # self.positions = {"boat": [], "cannonball": []}
         self.radius = 160 # in pixels
         self.raidus_vect = (self.radius, 0)
         self.center_of_game = (190, 265)
+
+        self.critical_distance = 40
+        self.angle_threshold = 10
 
 
     def run(self, seconds_to_play=None):
@@ -39,18 +41,21 @@ class Controller:
         start = time.time()
         self.start()
 
-        video_name = 'boat_angle.mp4'
+        video_name = 'bot_playing_visualization.mp4'
         fourcc = cv.VideoWriter_fourcc(*'mp4v')
-        video = cv.VideoWriter(video_name, fourcc, 5, (380, 690)) 
+        video = cv.VideoWriter(video_name, fourcc, 10, (380, 492)) 
 
-        cv.namedWindow("main")
+        # cv.namedWindow("main")
         
         while True:
 
             try:
                 image_vis = self.main_loop()
+                # cv.imwrite("temp.png", image_vis)
                 video.write(image_vis)
-            except:
+                # time.sleep(0.03)
+            except Exception as e:
+                # print(e)
                 pass
     
             # end when seconds_to_play passed
@@ -60,55 +65,79 @@ class Controller:
                 # print(self.positions)
                 # pd.DataFrame({"boat": self.positions["boat"]}).to_csv("boat_positions.csv")
                 # pd.DataFrame({"cannonball": self.positions["cannonball"]}).to_csv("cannonball_positions.csv")
-                video.release()
+                # video.release()
                 self.exit("Bot has finished execution")
 
         
     def main_loop(self):
         screenshot = take_screenshot(self.window_coordinates)
 
-        # TODO: check that only 1 exists
         boat_positions = self.get_position(screenshot, self.templates["boat"], self.template_thresholds["boat"])
         boat_position = self.non_maximum_suppression(boat_positions)
         boat_center = self.calc_center(boat_position[0])
                 
-        coins_position = self.get_position(screenshot, self.templates["coin"], self.template_thresholds["coin"])
-        coin_position = self.non_maximum_suppression(coins_position)
+        coin_positions = self.get_position(screenshot, self.templates["coin"], self.template_thresholds["coin"])
+        coin_positions = self.non_maximum_suppression(coin_positions)
 
         cannonballs_position = self.get_position(screenshot, self.templates["cannonball"], self.template_thresholds["cannonball"])
         cannonball_positions = self.non_maximum_suppression(cannonballs_position)
         cannonball_centers = [self.calc_center(cannonball_pos) for cannonball_pos in cannonball_positions]
-        cannonball_centers_normalised = [self.normalize_point(boat_center) for cannonball_center in cannonball_centers]
+        cannonball_centers_normalised = np.array([self.normalize_point(cannonball_center) for cannonball_center in cannonball_centers])
 
         boat_center_normalised = self.normalize_point(boat_center)
+
+        # Calculated angles
         boat_angle = self.calc_angle(boat_center_normalised, self.raidus_vect)
 
-        cannonball_angles = [self.calc_angle(cannonball_center, self.raidus_vect)
-                             for cannonball_center in cannonball_centers_normalised]
+        # cannonball_angles = [self.calc_angle(cannonball_center, self.raidus_vect)
+        #                      for cannonball_center in cannonball_centers_normalised]
         
-        print(cannonball_angles)
+        # angle_distances = [np.abs(boat_angle-cannonball_angle) for cannonball_angle in cannonball_angles]
+        # if any(angle_dist<self.angle_threshold for angle_dist in angle_distances):
+        #     print("Change direction")
+        #     print("angle distances", angle_distances)
+        #     self.change_direction()
         
+        # print(boat_center)
+        # for cannonball in cannonball_centers_normalised:
+        #     print(cannonball)
+
+        # print(cannonball_centers_normalised)
+        # print("cannonball_centers", cannonball_centers_normalised)
+        # print("boat center", boat_center)
+
+        # Actions based on distances
+
+        distances = np.linalg.norm(cannonball_centers_normalised-boat_center_normalised, ord=1, axis=1)
+        # print("distances", distances)
+        # print("cannonball_centers_normalised", cannonball_centers_normalised)
+
+        if any(dist <= self.critical_distance for dist in distances):
+            print("Change direction")
+            print("distances", distances)
+            print("cannonball_centers", cannonball_centers_normalised)
+            self.change_direction()
+        
+        # print(distances)
+
         image_vis = screenshot.copy()
         image_vis = self.draw_angle(image_vis, boat_angle)
+
+        image_vis = self.draw_rectangles(image_vis, boat_position, color=(255, 0, 0))
+        image_vis = self.draw_rectangles(image_vis, coin_positions, color=(0, 255, 0))
+        image_vis = self.draw_rectangles(image_vis, cannonball_positions, color=(0, 0, 255))
+
         # cv.imshow("main", image_vis)
         # cv.waitKey(30)
-
         return image_vis
-        # return None
-
-        # print(cannonball_centers)
-
-        # self.positions["boat"].extend(boat_position)
-        # self.positions["cannonball"].extend(cannonball_positions)
-
-        # image_vis = self.draw_rectangles(screenshot, boat_position, color=(255, 0, 0))
-        # image_vis = self.draw_rectangles(image_vis, coin_position, color=(0, 255, 0))
-        # image_vis = self.draw_rectangles(image_vis, cannonball_positions, color=(0, 0, 255))
-
-        # cv.imshow("main", image_vis)
-        # cv.waitKey(30)
 
     def start(self):
+        activate_window(self.window_id)
+        pyautogui.press("space")
+
+    
+    def change_direction(self):
+        activate_window(self.window_id)
         pyautogui.press("space")
 
     def get_position(self, screenshot, template, threshold) -> tuple:
@@ -160,7 +189,7 @@ class Controller:
         image_to_vis = image.copy()
                 
         for rect in rectangles:
-            print(rect)
+            # print(rect)
             top_left = (rect[0], rect[1])
             bottom_right = (rect[2], rect[3])
             cv.rectangle(image_to_vis, top_left, bottom_right, color, 1)
@@ -193,9 +222,8 @@ class Controller:
         
         return selected_boxes
     
-
     def calc_center(self, coordinates: tuple):
-        return (coordinates[0] + coordinates[2])//2, (coordinates[1] + coordinates[3])//2
+        return np.array([(coordinates[0] + coordinates[2])//2, (coordinates[1] + coordinates[3])//2])
 
     def calc_angle(self, a, b):
         a = np.array(a)
@@ -224,8 +252,8 @@ class Controller:
         return image
     
     def normalize_point(self, coordiantes: tuple[int, int]):
-        return (coordiantes[0]-self.center_of_game[0],
-                coordiantes[1]-self.center_of_game[1])
+        return np.array([coordiantes[0]-self.center_of_game[0],
+                coordiantes[1]-self.center_of_game[1]])
 
     def exit(self, message):
         sys.exit(message)
