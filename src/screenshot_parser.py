@@ -1,13 +1,17 @@
 import cv2 as cv
 import numpy as np
 
+from pathlib import Path
+
 
 class ScreenshotParser():
-    def __init__(self) -> None:
+    def __init__(self, game_center: tuple, raidus_vect: tuple) -> None:
+        self.game_center = game_center
+        self.raidus_vect = raidus_vect
         self.templates = self.load_templates()
         self.template_thresholds = {"boat": 0.55, "coin": 0.8, "cannonball": 0.6}
 
-    def parse_to_state(self, image: np.ndarray) -> dict:
+    def parse_to_state(self, screenshot: np.ndarray) -> dict:
         boat_positions = self.get_position(screenshot, self.templates["boat"], self.template_thresholds["boat"])
         boat_position = self.non_maximum_suppression(boat_positions)
         boat_center = self.calc_center(boat_position[0])
@@ -27,7 +31,7 @@ class ScreenshotParser():
 
 
         cannonball_angles = [self.calc_angle(cannonball_center, self.raidus_vect)
-                             for cannonball_center in cannonball_centers_normalise]
+                             for cannonball_center in cannonball_centers_normalised]
 
         return {"boat_center": boat_center_normalised,
                 "boat_angle": boat_angle,
@@ -74,8 +78,8 @@ class ScreenshotParser():
 
 
     def normalize_point(self, coordiantes: tuple[int, int]):
-        return np.array([coordiantes[0]-self.center_of_game[0],
-                coordiantes[1]-self.center_of_game[1]])
+        return np.array([coordiantes[0]-self.game_center[0],
+                coordiantes[1]-self.game_center[1]])
     
         
     def imshow(self, image, pause=0):

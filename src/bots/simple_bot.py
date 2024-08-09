@@ -16,7 +16,4 @@ class SimpleBot(Bot):
         distances = np.linalg.norm(cannonball_centers_normalised-boat_center_normalised, ord=1, axis=1)
 
         if any(dist <= self.critical_distance for dist in distances):
-            print("Change direction")
-            print("distances", distances)
-            print("cannonball_centers", cannonball_centers_normalised)
-            self.change_direction()
+            return "change_direction"

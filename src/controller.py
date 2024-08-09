@@ -15,18 +15,23 @@ from src.window_manipulation import (activate_window, find_window_id,
 
 
 class Controller:
-    def __init__(self, window_name = "TelegramDesktop") -> None:
-        self.screen_parser = ScreenshotParser()
+    def __init__(self, window_name = "TelegramDesktop"):
+        self.radius = 160 # in pixels
+        self.raidus_vect = (self.radius, 0)
+        self.center_of_game = (190, 265)
+
+        self.screen_parser = ScreenshotParser(
+            game_center = self.center_of_game,
+            raidus_vect = self.raidus_vect)
         self.visualizer = Visualizer()
+        # place to switch agents 
         self.agent = SimpleBot()
 
         self.window_name = window_name
         self.window_id = find_window_id(window_name)
 
         self.speeds = {"boat": 100, "cannonball": 6.32}
-        self.radius = 160 # in pixels
-        self.raidus_vect = (self.radius, 0)
-        self.center_of_game = (190, 265)
+
 
     def run(self, seconds_to_play=None):
         if self.window_id is None:
@@ -39,10 +44,12 @@ class Controller:
         self.start()
         
         while True:
+            
             try:
                 self.main_loop()
             except Exception as e:
                 print(e) 
+
             end = time.time()
             seconds_played = end - start
             if (seconds_to_play is not None) and (seconds_played >= seconds_to_play):
@@ -54,18 +61,6 @@ class Controller:
         action = self.agent.action(game_state)
         if action == "change_direction":
             self.change_direction()
-
-
-        # image_vis = screenshot.copy()
-        # image_vis = self.draw_angle(image_vis, boat_angle)
-
-        # image_vis = self.draw_rectangles(image_vis, boat_position, color=(255, 0, 0))
-        # image_vis = self.draw_rectangles(image_vis, coin_positions, color=(0, 255, 0))
-        # image_vis = self.draw_rectangles(image_vis, cannonball_positions, color=(0, 0, 255))
-
-        # cv.imshow("main", image_vis)
-        # cv.waitKey(30)
-        # return image_vis
 
     def start(self):
         activate_window(self.window_id)
