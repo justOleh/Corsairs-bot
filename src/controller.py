@@ -28,8 +28,8 @@ class Controller:
         self.visualizer = Visualizer()
         # place to switch agents 
         # self.agent = SimpleBot()
-        self.agent = RandomBot()
-        # self.agent = MemoryBot()
+        # self.agent = RandomBot()
+        self.agent = MemoryBot()
 
         self.window_name = window_name
         self.window_id = find_window_id(window_name)
