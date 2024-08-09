@@ -1,15 +1,14 @@
-import sys
 import os
+import sys
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(script_dir)
 sys.path.append(parent_dir)
 
-from src.controller import Controller
-
+import numpy as np
 import pytest
 
-import numpy as np
+from src.controller import Controller
 
 ct = Controller()
 

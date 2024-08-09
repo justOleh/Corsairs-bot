@@ -29,7 +29,7 @@ def get_window_coordinates(window_id):
             geometry['height'] = int(line.split()[-1])
     
     x1, y1 = geometry['x']+11, geometry['y']+11
-    width, height = geometry['width']-22, geometry['height']-22
+    width, height = geometry['width']-22, geometry['height']-220
     return x1, y1, width, height 
 
 

@@ -1,3 +1,4 @@
 isort
 matplotlib
 seaborn 
+flake8
