@@ -80,13 +80,6 @@ class ScreenshotParser():
     def normalize_point(self, coordiantes: tuple[int, int]):
         return np.array([coordiantes[0]-self.game_center[0],
                 coordiantes[1]-self.game_center[1]])
-    
-        
-    def imshow(self, image, pause=0):
-        cv.namedWindow("main")
-        cv.imshow("main", image)
-        cv.waitKey(pause)
-        cv.destroyWindow("main")
 
 
     def get_position(self, screenshot, template, threshold) -> tuple:

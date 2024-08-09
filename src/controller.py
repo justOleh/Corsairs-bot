@@ -33,7 +33,7 @@ class Controller:
         self.speeds = {"boat": 100, "cannonball": 6.32}
 
 
-    def run(self, seconds_to_play=None):
+    def run(self, seconds_to_play=None, visualize=False):
         if self.window_id is None:
             self.exit(f"Cannot find window: {self.window_name}")
 
@@ -42,25 +42,34 @@ class Controller:
 
         start = time.time()
         self.start()
+
+        if visualize:
+            self.visualizer.open_video_capture()
         
         while True:
-            
+
             try:
-                self.main_loop()
+                screenshot, state = self.main_loop()
+                if visualize:
+                    screenshot_vis = self.visualizer.draw_state(screenshot, state)
+                    self.visualizer.add_frame(screenshot_vis)
             except Exception as e:
                 print(e) 
 
             end = time.time()
             seconds_played = end - start
             if (seconds_to_play is not None) and (seconds_played >= seconds_to_play):
+                if visualize:
+                    self.visualizer.close_video_capture()
                 self.exit("Bot has finished execution")
  
-    def main_loop(self):
+    def main_loop(self) -> tuple:
         screenshot = take_screenshot(self.window_coordinates)
         game_state = self.screen_parser.parse_to_state(screenshot)
         action = self.agent.action(game_state)
         if action == "change_direction":
             self.change_direction()
+        return screenshot, game_state
 
     def start(self):
         activate_window(self.window_id)
