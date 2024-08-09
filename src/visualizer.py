@@ -4,7 +4,7 @@ import numpy as np
 
 class Visualizer:
     def __init__(self) -> None:
-        pass
+        self.video = None
 
     def draw_angle(self, image, value):
         font = cv.FONT_HERSHEY_SIMPLEX
@@ -52,8 +52,15 @@ class Visualizer:
 
         return image_vis
     
-
-    def do_something_with_video_stream():
-        video_name = 'bot_playing_visualization.mp4'
+    def open_video_capture(self, video_name='bot_playing_visualization.mp4'):
         fourcc = cv.VideoWriter_fourcc(*'mp4v')
-        video = cv.VideoWriter(video_name, fourcc, 10, (380, 492)) 
+        self.video = cv.VideoWriter(video_name, fourcc, 10, (380, 492)) 
+
+    def add_frame(self, frame):
+        if self.video is not None:
+            self.video.write(frame)
+
+    def close_video_capture(self):
+        if self.video is None:
+            raise ValueError("Video capture wasn't opened")
+        self.video.release()
