@@ -7,7 +7,9 @@ import numpy as np
 import pandas as pd
 import pyautogui
 
+from src.bots.random_bot import RandomBot
 from src.bots.simple_bot import SimpleBot
+from src.bots.memory_bot import MemoryBot
 from src.visualizer import Visualizer
 from src.screenshot_parser import ScreenshotParser
 from src.window_manipulation import (activate_window, find_window_id,
@@ -25,7 +27,9 @@ class Controller:
             raidus_vect = self.raidus_vect)
         self.visualizer = Visualizer()
         # place to switch agents 
-        self.agent = SimpleBot()
+        # self.agent = SimpleBot()
+        self.agent = RandomBot()
+        # self.agent = MemoryBot()
 
         self.window_name = window_name
         self.window_id = find_window_id(window_name)
