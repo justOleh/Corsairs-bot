@@ -32,7 +32,8 @@ class ScreenshotParser():
         return {"boat_center": boat_center_normalised,
                 "boat_angle": boat_angle,
                 "cannonball_centers": cannonball_centers_normalised,
-                "cannonbal_angles": cannonball_angles}
+                "cannonbal_angles": cannonball_angles,
+                "coin_positions": coin_positions}
 
 
     def non_maximum_suppression(self, rectangles, threshold=0.1):

@@ -3,7 +3,8 @@ import numpy as np
 
 
 class Visualizer:
-    pass
+    def __init__(self) -> None:
+        pass
 
     def draw_angle(self, image, value):
         font = cv.FONT_HERSHEY_SIMPLEX
@@ -33,6 +34,23 @@ class Visualizer:
             cv.rectangle(image_to_vis, top_left, bottom_right, color, 1)
 
         return image_to_vis
+    
+    def draw_state(self, image, state):
+
+        boat_position = state["boat_center"]
+        coin_positions = state["coin_positions"]
+        cannonball_positions = state["cannonball_positions"]
+
+        boat_angle = state["boat_angle"]
+
+        image_vis = image.copy()
+        image_vis = self.draw_angle(image_vis, boat_angle)
+
+        image_vis = self.draw_rectangles(image_vis, boat_position, color=(255, 0, 0))
+        image_vis = self.draw_rectangles(image_vis, coin_positions, color=(0, 255, 0))
+        image_vis = self.draw_rectangles(image_vis, cannonball_positions, color=(0, 0, 255))
+
+        return image_vis
     
 
     def do_something_with_video_stream():
