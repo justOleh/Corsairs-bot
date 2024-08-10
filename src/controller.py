@@ -49,9 +49,7 @@ class Controller:
 
         if visualize:
             self.visualizer.open_video_capture()
-        
         while True:
-            
             try:
                 screenshot, state = self.main_loop()
                 if visualize:

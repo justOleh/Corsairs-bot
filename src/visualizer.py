@@ -37,7 +37,7 @@ class Visualizer:
     
     def draw_state(self, image, state):
 
-        boat_position = state["boat_center"]
+        boat_position = state["boat_position"]
         coin_positions = state["coin_positions"]
         cannonball_positions = state["cannonball_positions"]
 
@@ -54,11 +54,12 @@ class Visualizer:
     
     def open_video_capture(self, video_name='bot_playing_visualization.mp4'):
         fourcc = cv.VideoWriter_fourcc(*'mp4v')
-        self.video = cv.VideoWriter(video_name, fourcc, 10, (380, 492)) 
+        self.video = cv.VideoWriter(video_name, fourcc, 15, (380, 492)) 
 
     def add_frame(self, frame):
-        if self.video is not None:
-            self.video.write(frame)
+        if self.video is None:
+            raise ValueError("Video capture wasn't opened")
+        self.video.write(frame)
 
     def close_video_capture(self):
         if self.video is None:
