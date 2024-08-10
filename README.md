@@ -5,11 +5,12 @@ The repository contains Corsairs bot, an agent for the game in Telegram app.  Yo
 ![Alt text](assets/bot_playing_visualization.gif)
 
 ## Intallation
+tbi 
 
 ## Usage guide
-
+tbi 
 ## Adding your own agent
-
+tbi 
 ## Memory Bot
 
 
