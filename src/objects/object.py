@@ -1,3 +1,5 @@
+# TODO: remove this whole folder
+
 class Object:
     def __init__(self) -> None:
         self.x = None

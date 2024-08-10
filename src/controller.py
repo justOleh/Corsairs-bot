@@ -33,10 +33,10 @@ class Controller:
 
         self.window_name = window_name
         self.window_id = find_window_id(window_name)
-
+        # TODO: remove or use
         self.speeds = {"boat": 100, "cannonball": 6.32}
 
-
+    # I truly dislike this peace of code. 
     def run(self, seconds_to_play=None, visualize=False):
         if self.window_id is None:
             self.exit(f"Cannot find window: {self.window_name}")
@@ -49,9 +49,7 @@ class Controller:
 
         if visualize:
             self.visualizer.open_video_capture()
-        
         while True:
-            
             try:
                 screenshot, state = self.main_loop()
                 if visualize:

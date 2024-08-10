@@ -4,6 +4,7 @@ import numpy as np
 from pathlib import Path
 
 
+# TODO: add documentation, refactor a bit
 class ScreenshotParser():
     def __init__(self, game_center: tuple, raidus_vect: tuple) -> None:
         self.game_center = game_center
@@ -34,7 +35,9 @@ class ScreenshotParser():
                              for cannonball_center in cannonball_centers_normalised]
 
         return {"boat_center": boat_center_normalised,
+                "boat_position": boat_position,
                 "boat_angle": boat_angle,
+                "cannonball_positions": cannonball_positions,
                 "cannonball_centers": cannonball_centers_normalised,
                 "cannonbal_angles": cannonball_angles,
                 "coin_positions": coin_positions}
