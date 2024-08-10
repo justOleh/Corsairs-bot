@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-
+# TOOD: add documentation for module and class
 class Visualizer:
     def __init__(self) -> None:
         self.video = None
