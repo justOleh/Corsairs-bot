@@ -4,6 +4,7 @@ import numpy as np
 from pathlib import Path
 
 
+# TODO: add documentation, refactor a bit
 class ScreenshotParser():
     def __init__(self, game_center: tuple, raidus_vect: tuple) -> None:
         self.game_center = game_center
