@@ -1,4 +1,5 @@
-import cv2 as cv 
+import cv2 as cv
+
 
 def imshow(self, image, pause=0):
     cv.namedWindow("main")

@@ -1,10 +1,9 @@
-import time
 import os
 import sys
+import time
 
 import cv2 as cv
 import numpy as np
-
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname((os.path.dirname(script_dir)))

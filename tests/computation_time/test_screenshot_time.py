@@ -1,8 +1,8 @@
-import time
-import numpy as np
-
 import os
 import sys
+import time
+
+import numpy as np
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname((os.path.dirname(script_dir)))
