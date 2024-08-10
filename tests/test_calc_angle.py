@@ -8,9 +8,8 @@ sys.path.append(parent_dir)
 import numpy as np
 import pytest
 
-from src.controller import Controller
-
-ct = Controller()
+from src.screenshot_parser import ScreenshotParser
+sp = ScreenshotParser((160, 0), (190, 265))
 
 
 @pytest.mark.parametrize("boat_vector, horizon_vector, expected_angle",
@@ -21,6 +20,6 @@ ct = Controller()
                           ((-113, -113), (160, 0), 135)])
 def test_calc_angle(boat_vector, horizon_vector, expected_angle):
 
-    calculated_angle = ct.calc_angle(boat_vector, horizon_vector)
+    calculated_angle = sp.calc_angle(boat_vector, horizon_vector)
 
     assert np.allclose(calculated_angle, expected_angle)

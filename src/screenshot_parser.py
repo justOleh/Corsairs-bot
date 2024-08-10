@@ -1,7 +1,7 @@
+from pathlib import Path
+
 import cv2 as cv
 import numpy as np
-
-from pathlib import Path
 
 
 # TODO: add documentation, refactor a bit
@@ -10,6 +10,7 @@ class ScreenshotParser():
         self.game_center = game_center
         self.raidus_vect = raidus_vect
         self.templates = self.load_templates()
+        # Move this stuff to config
         self.template_thresholds = {"boat": 0.55, "coin": 0.8, "cannonball": 0.6}
 
     def parse_to_state(self, screenshot: np.ndarray) -> dict:
