@@ -1,10 +1,15 @@
-# Corsairs-bot
-Bot for Corsairs telegram game. 
 
-### TODO:
-* description
-* * Photo of parsed field
-* installation
-* Usage guide
-* How to add your own bot
-* Representation of state 
+# Description
+The repository contains Corsairs bot, an agent for the game in Telegram app.  You can play this game by typing @gamebot and choosing Corsairs from dropdown menu.
+
+![Alt text](assets/bot_playing_visualization.gif)
+
+## Intallation
+
+## Usage guide
+
+## Adding your own agent
+
+## Memory Bot
+
+

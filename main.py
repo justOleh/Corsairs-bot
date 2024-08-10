@@ -24,7 +24,7 @@ if __name__ == "__main__":
     
     parser.add_argument("--window_name", type=str, default="TelegramDesktop", help="Name of the window to control.")
     parser.add_argument("--seconds_to_play", type=int, default=5, help="Number of seconds for bot to play.")
-    parser.add_argument("--visualize", type=bool, default=True, help="Whether to visualize the controller's actions.")
+    parser.add_argument("--visualize", action="store_true", default=False, help="Whether to visualize the controller's actions.")
     parser.add_argument("--bot_name", type=str, default="MemoryBot", choices=['MemoryBot', 'RandomBot', 'SimpleBot'],
                         help="Select bot name of the available options")
     
