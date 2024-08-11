@@ -4,13 +4,15 @@ The repository contains Corsairs bot, an agent for the game in Telegram app.  Yo
 
 ![Alt text](assets/bot_playing_visualization.gif)
 
-## Intallation
-tbi 
-
+## Installation
+tbd 
 ## Usage guide
-tbi 
+tbd 
 ## Adding your own agent
-tbi 
-## Memory Bot
+tbd 
 
+### Notes:
+At the current state, the bot can win 1st round if lucky.
+But more stable play requires an RL approach, which is time-consuming. 
+Development left for better times. 
 
